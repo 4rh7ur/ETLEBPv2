@@ -15,7 +15,7 @@
 #' @examples
 #' cria_base_intermediaria_aneel()
 cria_base_intermediaria_aneel <- function(
-  origem_processos = here::here("data/SGPED_BI/PD Busca Textual.csv"),
+  #origem_processos = here::here("data/SGPED_BI/PD Busca Textual.csv"),
   origem_equipes = here::here("data/SGPED_BI/5.PD RF EQUIPE.csv")
 ){
 
