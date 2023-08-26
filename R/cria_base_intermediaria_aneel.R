@@ -15,8 +15,8 @@
 #' @examples
 #' cria_base_intermediaria_aneel()
 cria_base_intermediaria_aneel <- function(
-  #origem_processos = here::here("data/SGPED_BI/PD Busca Textual.csv"),
-  origem_equipes = here::here("data/SGPED_BI/5.PD RF EQUIPE.csv")
+  origem_processos = here::here("data/SGPED_BI/ANEEL_proj-ped-energia-eletrica.csv")
+  #origem_equipes = here::here("data/SGPED_BI/5.PD RF EQUIPE.csv")
 ){
 
 
@@ -24,26 +24,40 @@ cria_base_intermediaria_aneel <- function(
   ##get the data ##
 
   #importando o dataset
-  anel_pd <- readr::read_delim(origem_processos,
-                        ";", escape_double = FALSE, locale = readr::locale(encoding = "latin1"),
-                        trim_ws = TRUE) %>%
+  anel_pd <- read.csv2(origem_processos,encoding = "latin1") %>%
     janitor::clean_names()
 
-  anel_pd <- anel_pd%>%
-    dplyr::mutate(data_de_carregamento   = lubridate::as_date(lubridate::dmy_hms(data_de_carregamento)),
-           data_de_conclusao             = lubridate::dmy(data_de_conclusao),
-           duracao_prevista              = lubridate::date(data_de_carregamento+lubridate::dmonths(duracao_prevista_meses)),
-           data_de_conclusao             = dplyr::case_when(is.na(data_de_conclusao) ~ duracao_prevista,
-                                              TRUE~data_de_conclusao ),
+  anel_pd <- anel_pd %>%
+    mutate(data_de_carregamento = as.Date(paste0(ano_cadastro_proposta_projeto,"-01-01")),
+           dat_conclusao_projeto = as.Date(dat_conclusao_projeto,format="%d/%m/%Y")) %>%
+    rename("data_de_conclusao" = "dat_conclusao_projeto",
+           "duracao_prevista_meses" = "qtd_meses_duracao_prevista",
+           "custo_total_previsto" = "vlr_custo_total_previsto",
+           "custo_total_realizado" = "vlr_custo_total_auditado",
+           "titulo" = "dsc_titulo_projeto",
+           "segmento" = "sig_segmento_setor_eletrico",
+           "tema" = "sig_tema_projeto",
+           "proponente" = "nom_agente",
+           "situacao" = "idc_situacao_projeto") %>%
+
+
+    dplyr::mutate(#data_de_carregamento   = lubridate::as_date(lubridate::dmy_hms(data_de_carregamento)),
+           #data_de_conclusao             = lubridate::dmy(data_de_conclusao),
+           duracao_prevista              = case_when(!is.na(data_de_conclusao) ~ data_de_conclusao,
+                                                     TRUE ~ lubridate::date(data_de_carregamento+lubridate::dmonths(duracao_prevista_meses))),
+           #data_de_conclusao             = dplyr::case_when(is.na(data_de_conclusao) ~ duracao_prevista,
+           #                                  TRUE~data_de_conclusao ),
            custo_total_previsto          = as.numeric(stringr::str_replace_all(
                                            stringr::str_replace_all(custo_total_previsto, "[.$]", ""), "[,]", "." )),
            custo_total_realizado         = as.numeric(stringr::str_replace_all(
                                            stringr::str_replace_all(custo_total_realizado, "[.$]", ""), "[,]", "." )),
            custo_total_realizado         = dplyr::case_when(is.na(custo_total_realizado) ~ custo_total_previsto,
                                            TRUE~custo_total_realizado),
-           duracao_dias                  = lubridate::time_length(data_de_conclusao - data_de_carregamento, "days"),
+           #duracao_dias                  = lubridate::time_length(data_de_conclusao - data_de_carregamento, "days"),
+           duracao_dias                  = trunc(duracao_prevista_meses*30),
            #duracao_dias           = interval(data_de_carregamento, data_de_conclusao)/ddays(),
-           duracao_anos                  = as.integer(lubridate::interval(data_de_carregamento, data_de_conclusao)/lubridate::dyears()),
+           duracao_anos                  = trunc(duracao_prevista_meses/12),
+           #duracao_anos                  = as.integer(lubridate::interval(data_de_carregamento, data_de_conclusao)/lubridate::dyears()),
            motor                         = stringi::stri_trans_general(paste(titulo,segmento,tema),
                                                                 "Latin-ASCII"),
            motor                         = tolower(motor)) %>%
@@ -65,13 +79,13 @@ cria_base_intermediaria_aneel <- function(
    anel_pd <- anel_pd %>% dplyr::mutate(categorias = dplyr::recode(categorias,
                                                         "character(0" = "nenhuma categoria encontrada"))
 
-  aneel_time <- readr::read_csv2(origem_equipes)%>%
-    dplyr::filter(`Tipo de Entidade` == "Proponente")  %>%
-    dplyr::select(CodProj,`Entidade Vinculada`,`Unidade Federativa`) %>%
-    dplyr::distinct() %>%
-    janitor::clean_names()
+  # aneel_time <- readr::read_csv2(origem_equipes)%>%
+  #   dplyr::filter(`Tipo de Entidade` == "Proponente")  %>%
+  #   dplyr::select(CodProj,`Entidade Vinculada`,`Unidade Federativa`) %>%
+  #   dplyr::distinct() %>%
+  #   janitor::clean_names()
 
-  anel_pd <- dplyr::left_join(anel_pd, aneel_time, by = "cod_proj")
+  #anel_pd <- dplyr::left_join(anel_pd, aneel_time, by = "cod_proj")
 
   anel_pd<- anel_pd %>% dplyr::mutate(regiao_ag_executor = dplyr::recode(unidade_federativa,
                                                            "AC" = "N",
