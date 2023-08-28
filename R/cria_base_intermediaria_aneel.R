@@ -41,35 +41,22 @@ cria_base_intermediaria_aneel <- function(
            "situacao" = "idc_situacao_projeto") %>%
 
 
-    dplyr::mutate(#data_de_carregamento   = lubridate::as_date(lubridate::dmy_hms(data_de_carregamento)),
-           #data_de_conclusao             = lubridate::dmy(data_de_conclusao),
-           duracao_prevista              = case_when(!is.na(data_de_conclusao) ~ data_de_conclusao,
+    dplyr::mutate(duracao_prevista              = case_when(!is.na(data_de_conclusao) ~ data_de_conclusao,
                                                      TRUE ~ lubridate::date(data_de_carregamento+lubridate::dmonths(duracao_prevista_meses))),
-           #data_de_conclusao             = dplyr::case_when(is.na(data_de_conclusao) ~ duracao_prevista,
-           #                                  TRUE~data_de_conclusao ),
            custo_total_previsto          = as.numeric(stringr::str_replace_all(
                                            stringr::str_replace_all(custo_total_previsto, "[.$]", ""), "[,]", "." )),
            custo_total_realizado         = as.numeric(stringr::str_replace_all(
                                            stringr::str_replace_all(custo_total_realizado, "[.$]", ""), "[,]", "." )),
            custo_total_realizado         = dplyr::case_when(is.na(custo_total_realizado) ~ custo_total_previsto,
                                            TRUE~custo_total_realizado),
-           #duracao_dias                  = lubridate::time_length(data_de_conclusao - data_de_carregamento, "days"),
-           duracao_dias                  = trunc(duracao_prevista_meses*30),
-           #duracao_dias           = interval(data_de_carregamento, data_de_conclusao)/ddays(),
-           duracao_anos                  = trunc(duracao_prevista_meses/12),
-           #duracao_anos                  = as.integer(lubridate::interval(data_de_carregamento, data_de_conclusao)/lubridate::dyears()),
+           duracao_dias                  = lubridate::time_length(data_de_conclusao - data_de_carregamento, "days"),
+           duracao_anos                  = as.integer(lubridate::interval(data_de_carregamento, data_de_conclusao)/lubridate::dyears()),
+           data_de_conclusao             = duracao_prevista,
            motor                         = stringi::stri_trans_general(paste(titulo,segmento,tema),
                                                                 "Latin-ASCII"),
            motor                         = tolower(motor)) %>%
     dplyr::filter(duracao_prevista >= "2013-01-01") %>%
     tidyr::drop_na(custo_total_previsto)
-
-   #Old function
-#  anel_pd <- func_a(anel_pd,
-#                                data_assinatura = anel_pd$data_de_carregamento,
-#                                data_limite = anel_pd$data_de_conclusao,
-#                                duracao_dias = anel_pd$duracao_dias,
-#                                valor_contratado = anel_pd$custo_total_previsto)
 
    anel_pd <- func_a(anel_pd, cod_proj, data_de_carregamento,
                      data_de_conclusao,custo_total_previsto)
@@ -79,62 +66,29 @@ cria_base_intermediaria_aneel <- function(
    anel_pd <- anel_pd %>% dplyr::mutate(categorias = dplyr::recode(categorias,
                                                         "character(0" = "nenhuma categoria encontrada"))
 
-  # aneel_time <- readr::read_csv2(origem_equipes)%>%
-  #   dplyr::filter(`Tipo de Entidade` == "Proponente")  %>%
-  #   dplyr::select(CodProj,`Entidade Vinculada`,`Unidade Federativa`) %>%
-  #   dplyr::distinct() %>%
-  #   janitor::clean_names()
-
-  #anel_pd <- dplyr::left_join(anel_pd, aneel_time, by = "cod_proj")
-
-  anel_pd<- anel_pd %>% dplyr::mutate(regiao_ag_executor = dplyr::recode(unidade_federativa,
-                                                           "AC" = "N",
-                                                           "AL" = "NE",
-                                                           "AM" = "N",
-                                                           "BA" = "NE",
-                                                           "CE" = "NE",
-                                                           "DF" = "CO",
-                                                           "ES" = "SE",
-                                                           "GO" = "CO",
-                                                           "MA" = "NE",
-                                                           "MG" = "SE",
-                                                           "MS" = "CO",
-                                                           "MT" = "CO",
-                                                           "PA" = "N",
-                                                           "PB" = "NE",
-                                                           "PE" = "NE",
-                                                           "PI" = "NE",
-                                                           "PR" = "S",
-                                                           "RJ" = "SE",
-                                                           "RN" = "NE",
-                                                           "RO" = "N",
-                                                           "RS" = "S",
-                                                           "SC" = "S",
-                                                           "SE" = "NE",
-                                                           "SP" = "SE",
-                                                           "TO" = "N"
-  ))
-  anel_pd <- anel_pd %>%
+   anel_pd <- anel_pd %>%
     dplyr::mutate(
            id                          = paste("ANEEL", cod_proj, sep = "-"),
-           fonte_de_dados                 = "ANEEL",
+           fonte_de_dados              = "ANEEL",
            data_assinatura             = data_de_carregamento,
            data_limite                 = data_de_conclusao,
            duracao_dias                = duracao_dias,
            duracao_meses               = duracao_prevista,
            valor_contratado            = custo_total_previsto,
-           valor_executado_2013_2025   = gasto_2013_2020,
+           valor_executado             = gasto_executado,
            nome_agente_financiador     = proponente,
            natureza_agente_financiador = "Empresa Privada", # confirmar
-           natureza_financiamento    = "Publicamente Orientado",
+           natureza_financiamento      = "Publicamente Orientado",
            modalidade_financiamento    = "Não se Aplica",
-           nome_agente_executor        = entidade_vinculada,
+           nome_agente_executor        = proponente,
            natureza_agente_executor    = "Empresa Privada", # confirmar
            'p&d_ou_demonstracao'       = NA,
            titulo_projeto              = titulo,
-           status_projeto              = situacao,
-           uf_ag_executor              = unidade_federativa,
-           valor_executado_2013        = gasto_2013,
+           status_projeto              = situacao
+    )
+
+  anel_pd <- anel_pd %>%
+    rename(valor_executado_2013        = gasto_2013,
            valor_executado_2014        = gasto_2014,
            valor_executado_2015        = gasto_2015,
            valor_executado_2016        = gasto_2016,
@@ -147,9 +101,7 @@ cria_base_intermediaria_aneel <- function(
            valor_executado_2023        = gasto_2023,
            valor_executado_2024        = gasto_2024,
            valor_executado_2025        = gasto_2025,
-           motor
-    )
-
+           motor)
 
 
   anel_pd <- anel_pd %>%
