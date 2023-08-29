@@ -60,11 +60,11 @@ func_a<-function(df,
     #Aqui eu inseri uma alteração
     #para duração dias >1 total_dias_projeto-1
     #para duração dias ==1 total_dias_projeto
-    dplyr::mutate(gasto_2013_2020 = case_when(duracao_dias > 1 ~ ((total_dias_projeto-1)/time_length({{prazo_utilizacao}}-{{data_inicio}}, "days"))*{{valor_projeto}},
+    dplyr::mutate(gasto_executado = case_when(duracao_dias > 1 ~ ((total_dias_projeto-1)/time_length({{prazo_utilizacao}}-{{data_inicio}}, "days"))*{{valor_projeto}},
                                               duracao_dias == 1 ~ ((total_dias_projeto)/time_length({{prazo_utilizacao}}-{{data_inicio}}, "days"))*{{valor_projeto}},
                                        duracao_dias == 0 ~ {{valor_projeto}}),
-           valor_gasto_ano = (gasto_2013_2020/total_dias_projeto)*duracao_dias,
-           gasto_2013_2020 = case_when(is.na(gasto_2013_2020) == T ~ gasto_2013_2020)) %>%
+           valor_gasto_ano = (gasto_executado/total_dias_projeto)*duracao_dias,
+           gasto_executado = case_when(is.na(gasto_executado) == T ~ gasto_executado)) %>%
     tidyr::replace_na(list(valor_gasto_ano = 0, duracao_dias =0 )) %>%
 
     dplyr::relocate(
@@ -72,7 +72,7 @@ func_a<-function(df,
       duracao_dias,
       ano_contagem_dias,
       gasto_ano,
-      gasto_2013_2020,
+      gasto_executado,
       valor_gasto_ano,
       total_dias_projeto,
       .after = {{prazo_utilizacao}}
@@ -81,12 +81,7 @@ func_a<-function(df,
     tidyr::pivot_wider(names_from =  gasto_ano,
                        values_from = valor_gasto_ano)%>%
     dplyr::group_by({{processo}}) %>%
-    dplyr::mutate(gasto_2013_2020 = sum(gasto_2013,gasto_2014,gasto_2015,
-                                 gasto_2016,gasto_2017,gasto_2018,
-                                 gasto_2019,gasto_2020,gasto_2021,
-                                 gasto_2022,gasto_2023,gasto_2024,
-                                 gasto_2025
-                                 )) %>%
+    dplyr::mutate(gasto_executado = sum(c_across(starts_with("gasto_2")), na.rm = T)) %>%
     dplyr::ungroup()
 
   df <-left_join(df, calculos)
@@ -95,17 +90,15 @@ func_a<-function(df,
     data <- df
 
     data <- data %>%
-      mutate(proxy = ifelse({{data_inicio}} == {{prazo_utilizacao}} & gasto_2013_2020 == 0, "sim", "não"),
-             gasto_2013_2020 = ifelse(proxy == "sim" , {{valor_projeto}}, gasto_2013_2020),
-             gasto_2013 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2013, {{valor_projeto}}, gasto_2013  ),
-             gasto_2014 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2014, {{valor_projeto}}, gasto_2014  ),
-             gasto_2015 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2015, {{valor_projeto}}, gasto_2015  ),
-             gasto_2016 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2016, {{valor_projeto}}, gasto_2016  ),
-             gasto_2017 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2017, {{valor_projeto}}, gasto_2017  ),
-             gasto_2018 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2018, {{valor_projeto}}, gasto_2018  ),
-             gasto_2019 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2019, {{valor_projeto}}, gasto_2019  ),
-             gasto_2020 = ifelse(proxy == "sim" & lubridate::year({{data_inicio}}) == 2020, {{valor_projeto}}, gasto_2020  )
-      ) %>%
+      mutate(proxy = ifelse({{data_inicio}} == {{prazo_utilizacao}} & gasto_executado == 0, "sim", "não"),
+             gasto_executado = ifelse(proxy == "sim" , {{valor_projeto}}, gasto_executado))
+
+    vars=names(data);vars=vars[stringr::str_detect(vars,"gasto_2")]
+    for(i in vars){
+      data[,i]=ifelse(data$proxy == "sim" & lubridate::year(data$data_de_carregamento) == as.numeric(substr(i,7,10)),data$custo_total_previsto,data[,i])
+    }
+
+    data<-data %>%
       select(-proxy)
   }
 
