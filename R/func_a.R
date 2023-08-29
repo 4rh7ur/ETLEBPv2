@@ -22,7 +22,7 @@ func_a<-function(df,
                valor_projeto){
 
   ano_inicio <- 2013
-  ano_fim <- 2025
+  ano_fim <- unique(lubridate::year(max(df$data_de_conclusao)))
 
   anos_periodos <- dplyr::tibble(
     ano_contagem_dias = ano_inicio:ano_fim,
