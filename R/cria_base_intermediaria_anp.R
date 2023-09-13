@@ -12,17 +12,18 @@
 #'
 #' @examples
 #' cria_base_intermediaria_anp()
-cria_base_intermediaria_anp <- function(origem_processos = here::here("data/ANP/projetos-rt-3-2015.csv")#,
+cria_base_intermediaria_anp <- function(origem_processos = here::here("data/ANP/projetos-rt-3-2015_2023.csv")#,
                                         #origem_enriquecimento = here::here("data/ANP/4.anp.csv")
                                         ) {
 
-  anp_2015 <- readr::read_delim(origem_processos,
+  anp <- readr::read_delim(origem_processos,
                          ";", escape_double = FALSE, trim_ws = TRUE) %>%
               janitor::clean_names()
-  anp_2015 <- anp_2015 %>%
+
+  anp <- anp %>%
     dplyr::mutate(
       valor_clausula       = as.numeric(stringr::str_replace_all(
-                             stringr::str_remove_all(valor_clausula, "[.R$ ]"), "[,]", ".")),
+                             stringr::str_remove_all(valor_clausula, "[R$ ]"), "[,]", "")),
       data_inicio          = lubridate::dmy(data_inicio),
       prazo_utilizacao     = data_inicio + months(prazo),
       prazo_decorrido_dias = lubridate::time_length(prazo_utilizacao - data_inicio, "days"),
@@ -39,31 +40,12 @@ cria_base_intermediaria_anp <- function(origem_processos = here::here("data/ANP/
            prazo_utilizacao = prazo_utilizacao,
            valor_projeto = valor_clausula)
 
-  #df<-anp_2015%>%dplyr::summarise(gasto_2013 = sum(gasto_2013),
-  #                                gasto_2014 = sum(gasto_2014, na.rm = T),
-  #                                gasto_2015 = sum(gasto_2015, na.rm = T),
-  #                                gasto_2016 = sum(gasto_2016, na.rm = T),
-  #                                gasto_2017 = sum(gasto_2017, na.rm = T),
-  #                                gasto_2018 = sum(gasto_2018, na.rm = T))
 
-  #anp_bruto <- readr::read_delim(origem_enriquecimento,
-  #                               delim = ";", escape_double = FALSE, trim_ws = TRUE,
-  #                               skip = 4) %>% janitor::clean_names()
-
-  #anp_2015 <- anp_2015 %>% dplyr::mutate(carga = ifelse(no_anp %in% anp_bruto$no_anp, "sim", "não"),
-  #                          gasto_2016 = ifelse(carga == "sim", 0, gasto_2016),
-  #                          gasto_2017 = ifelse(carga == "sim", 0, gasto_2017),
-  #                          gasto_2018 = ifelse(carga == "sim", 0, gasto_2018))
-
-  #anp_2015 <- anp_2015 %>%
-  #  dplyr::mutate(gasto_2013_2020 = gasto_2016+gasto_2017+gasto_2018+gasto_2019+gasto_2020)
-
-
-anp_2015 <-dtc_categorias(anp_2015,no_anp, motor)
-anp_2015 <- anp_2015 %>% dplyr::mutate(categorias = dplyr::recode(categorias,
+anp <-dtc_categorias(anp,no_anp, motor)
+anp <- anp %>% dplyr::mutate(categorias = dplyr::recode(categorias,
                                                                  "character(0" = "nenhuma categoria encontrada"))
 
-anp_2015 <- valida_termos_anp(anp_2015, anp_2015$categorias)
+anp <- valida_termos_anp(anp, anp$categorias)
   #Old func
 #  anp_2015 <- func_a(anp_2015,
 #                     data_assinatura = anp_2015$data_inicio,
@@ -73,71 +55,40 @@ anp_2015 <- valida_termos_anp(anp_2015, anp_2015$categorias)
 
 #anp_2015 <-
 
-  anp_2015<-anp_2015 %>%
-            dplyr::mutate(
-            id                = paste("ANP", no_anp, sep = "-"),
-            fonte_de_dados              = "ANP",
-            titulo_projeto              = titulo,
-            data_assinatura             = data_inicio,
-            data_limite                 = prazo_utilizacao,
-            duracao_meses               = prazo,
-            duracao_dias                = prazo_decorrido_dias,
-            duracao_anos                = prazo_decorrido_anos,
-            valor_contratado            = valor_clausula,
-            valor_executado_2013_2025   = gasto_2013_2020,
-            nome_agente_financiador     = empresa_responsavel,
-            natureza_agente_financiador = "Empresa Privada", # confirmar
-            natureza_financiamento      = "publicamente orientado",
-            modalidade_financiamento    = NA,
-            nome_agente_executor        = executor_1,
-            natureza_agente_executor    = 'Empresa Privada', # confirmar
-            'p&d_ou_demonstracao'       = NA,
-            uf_ag_executor              = NA,
-            regiao_ag_executor          = NA,
-            status_projeto              = NA,
-            valor_executado_2013        = gasto_2013,
-            valor_executado_2014        = gasto_2014,
-            valor_executado_2015        = gasto_2015,
-            valor_executado_2016        = gasto_2016,
-            valor_executado_2017        = gasto_2017,
-            valor_executado_2018        = gasto_2018,
-            valor_executado_2019        = gasto_2019,
-            valor_executado_2020        = gasto_2020,
-            valor_executado_2021        = gasto_2021,
-            valor_executado_2022        = gasto_2022,
-            valor_executado_2023        = gasto_2023,
-            valor_executado_2024        = gasto_2024,
-            valor_executado_2025        = gasto_2025)
+  anp<-anp %>%
+    dplyr::mutate(
+    id                = paste("ANP", no_anp, sep = "-"),
+    fonte_de_dados              = "ANP",
+    titulo_projeto              = titulo,
+    data_assinatura             = data_inicio,
+    data_limite                 = prazo_utilizacao,
+    duracao_meses               = prazo,
+    duracao_dias                = prazo_decorrido_dias,
+    duracao_anos                = prazo_decorrido_anos,
+    valor_contratado            = valor_clausula,
+    valor_executado             = gasto_executado,
+    nome_agente_financiador     = empresa_responsavel,
+    natureza_agente_financiador = "Empresa Privada", # confirmar
+    natureza_financiamento      = "publicamente orientado",
+    modalidade_financiamento    = NA,
+    nome_agente_executor        = executor_1,
+    natureza_agente_executor    = 'Empresa Privada', # confirmar
+    'p&d_ou_demonstracao'       = NA,
+    uf_ag_executor              = NA,
+    regiao_ag_executor          = NA,
+    status_projeto              = NA)
 
-  anp_2015<-anp_2015 %>%
-    dplyr::select(
-            id,
-            fonte_de_dados,
-            data_assinatura,
-            data_limite,
-            duracao_dias,
-            titulo_projeto,
-            status_projeto,
-            valor_contratado,
-            valor_executado_2013_2025,
-            nome_agente_financiador,
-            natureza_financiamento,
-            natureza_agente_financiador,
-            modalidade_financiamento,
-            nome_agente_executor,
-            natureza_agente_executor,
-            uf_ag_executor,
-            regiao_ag_executor,
-            `p&d_ou_demonstracao`,
-            valor_executado_2013,valor_executado_2014,
-            valor_executado_2015,valor_executado_2016,
-            valor_executado_2017,valor_executado_2018,
-            valor_executado_2019,valor_executado_2020,
-            valor_executado_2021,valor_executado_2022,
-            valor_executado_2023,valor_executado_2024,
-            valor_executado_2025,
-            motor,
-            categorias)
+  names(anp)=str_replace_all(names(anp),"gasto_2","valor_executado_2")
 
-  anp_2015
+  vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
+         "titulo_projeto","status_projeto","valor_contratado","valor_executado",
+         "nome_agente_financiador","natureza_financiamento","natureza_agente_financiador",
+         "modalidade_financiamento","nome_agente_executor","natureza_agente_executor",
+         "uf_ag_executor","regiao_ag_executor","p&d_ou_demonstracao",
+         names(anp)[str_detect(names(anp),"valor_executado_")],"motor","categorias")
+
+  anp<-anp %>%
+    dplyr::select(vars)
+
+  anp
 }
