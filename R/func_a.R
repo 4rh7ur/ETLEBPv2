@@ -22,7 +22,9 @@ func_a<-function(df,
                valor_projeto){
 
   ano_inicio <- 2013
-  ano_fim <- unique(lubridate::year(max(df$data_de_conclusao)))
+  #ano_fim <- unique(lubridate::year(max({{prazo_utilizacao}})))
+  ano_fim <- unlist(df %>% mutate(year=lubridate::year({{prazo_utilizacao}})) %>% filter(year==max(year))%>%
+                      dplyr::select(year) %>% unique())
 
   anos_periodos <- dplyr::tibble(
     ano_contagem_dias = ano_inicio:ano_fim,
@@ -91,12 +93,10 @@ func_a<-function(df,
 
     data <- data %>%
       mutate(proxy = ifelse({{data_inicio}} == {{prazo_utilizacao}} & gasto_executado == 0, "sim", "não"),
-             gasto_executado = ifelse(proxy == "sim" , {{valor_projeto}}, gasto_executado))
+             gasto_executado = ifelse(proxy == "sim" , {{valor_projeto}}, gasto_executado)) %>%
+      mutate_at(vars(starts_with("gasto_2")),funs(ifelse(proxy == "sim",valor_projeto,.)))
 
-    vars=names(data);vars=vars[stringr::str_detect(vars,"gasto_2")]
-    for(i in vars){
-      data[,i]=ifelse(data$proxy == "sim" & lubridate::year(data$data_de_carregamento) == as.numeric(substr(i,7,10)),data$custo_total_previsto,data[,i])
-    }
+    data
 
     data<-data %>%
       select(-proxy)

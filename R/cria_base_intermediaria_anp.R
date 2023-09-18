@@ -22,7 +22,7 @@ cria_base_intermediaria_anp <- function(origem_processos = here::here("data/ANP/
 
   anp <- anp %>%
     dplyr::mutate(
-      valor_clausula       = as.numeric(stringr::str_replace_all(
+      valor_projeto       = as.numeric(stringr::str_replace_all(
                              stringr::str_remove_all(valor_clausula, "[R$ ]"), "[,]", "")),
       data_inicio          = lubridate::dmy(data_inicio),
       prazo_utilizacao     = data_inicio + months(prazo),
@@ -33,12 +33,12 @@ cria_base_intermediaria_anp <- function(origem_processos = here::here("data/ANP/
       motor                = tolower(motor)
     ) %>%
     dplyr::filter(prazo_utilizacao >= "2013-01-01") %>%
-    tidyr::drop_na(valor_clausula) %>%
+    tidyr::drop_na(valor_projeto) %>%
     func_a(#df = anp_2015,
            processo = no_anp,
            data_inicio = data_inicio,
            prazo_utilizacao = prazo_utilizacao,
-           valor_projeto = valor_clausula)
+           valor_projeto = valor_projeto)
 
 
 anp <-dtc_categorias(anp,no_anp, motor)
@@ -46,14 +46,6 @@ anp <- anp %>% dplyr::mutate(categorias = dplyr::recode(categorias,
                                                                  "character(0" = "nenhuma categoria encontrada"))
 
 anp <- valida_termos_anp(anp, anp$categorias)
-  #Old func
-#  anp_2015 <- func_a(anp_2015,
-#                     data_assinatura = anp_2015$data_inicio,
-#                     data_limite = anp_2015$prazo_utilizacao,
-#                     duracao_dias = anp_2015$prazo_decorrido_dias,
-#                     valor_contratado = anp_2015$valor_clausula)
-
-#anp_2015 <-
 
   anp<-anp %>%
     dplyr::mutate(
@@ -65,7 +57,7 @@ anp <- valida_termos_anp(anp, anp$categorias)
     duracao_meses               = prazo,
     duracao_dias                = prazo_decorrido_dias,
     duracao_anos                = prazo_decorrido_anos,
-    valor_contratado            = valor_clausula,
+    valor_contratado            = valor_projeto,
     valor_executado             = gasto_executado,
     nome_agente_financiador     = empresa_responsavel,
     natureza_agente_financiador = "Empresa Privada", # confirmar
