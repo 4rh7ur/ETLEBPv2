@@ -7,7 +7,7 @@
 #'
 #' @examples
 #' cria_base_intermediaria_fapesp()
-cria_base_intermediaria_fapesp <- function(origem_processos = here::here("data/FAPESP/PROJETOS FAPESP SELECIONADOS INOVA-E - VALORES - 13 dez 2021.xlsx")){
+cria_base_intermediaria_fapesp <- function(origem_processos = here::here("data/FAPESP/auxilios-bolsas-vigentes-2021-e-2022-assuntos-solicitados-valores-concedidos.xlsx")){
 #Termos de área -----------------------------------
   termos_a<- c("Botânica","Ciência e Tecnologia de Alimentos",
                "Direito", "Ecologia", "Educação Física", "Enfermagem",
@@ -51,12 +51,12 @@ cria_base_intermediaria_fapesp <- function(origem_processos = here::here("data/F
                   motor = tolower(motor)) %>%
     dplyr::filter(!area_do_conhecimento %in% termos_a,
                   !subarea_do_conhecimento %in% termos_sa) %>%
-    tidyr::drop_na(valor_desembolsado)
+    tidyr::drop_na(valor_concedido)
 
   fapesp2 <- fapesp2 %>%
     #dplyr::slice(1:7488) %>%
     func_a(n_processo, data_inicio,
-           data_termino,valor_desembolsado)
+           data_termino,valor_concedido)
 
   fapesp2 <- fapesp2 %>% dtc_categorias(n_processo,motor)
 
@@ -70,8 +70,8 @@ cria_base_intermediaria_fapesp <- function(origem_processos = here::here("data/F
       data_assinatura             = data_inicio,
       data_limite                 = data_termino,
       duracao_dias                = duracao_dias,
-      valor_contratado            = valor_desembolsado,
-      valor_executado_2013_2025   = gasto_2013_2020,
+      valor_contratado            = valor_concedido,
+      valor_executado             = gasto_executado,
       nome_agente_financiador     = "FAPESP",
       natureza_agente_financiador = "Empresa Pública", # confirmar
       natureza_financiamento    = "Público",
@@ -82,49 +82,20 @@ cria_base_intermediaria_fapesp <- function(origem_processos = here::here("data/F
       titulo_projeto              = titulo_portugues,
       status_projeto              = NA,
       uf_ag_executor              = "SP",
-      regiao_ag_executor          = "SUDESTE",
-      valor_executado_2013        = gasto_2013,
-      valor_executado_2014        = gasto_2014,
-      valor_executado_2015        = gasto_2015,
-      valor_executado_2016        = gasto_2016,
-      valor_executado_2017        = gasto_2017,
-      valor_executado_2018        = gasto_2018,
-      valor_executado_2019        = gasto_2019,
-      valor_executado_2020        = gasto_2020,
-      valor_executado_2021        = gasto_2021,
-      valor_executado_2022        = gasto_2022,
-      valor_executado_2023        = gasto_2023,
-      valor_executado_2024        = gasto_2024,
-      valor_executado_2025        = gasto_2025)
+      regiao_ag_executor          = "SUDESTE")
+
+  names(fapesp2)=str_replace_all(names(fapesp2),"gasto_2","valor_executado_2")
+
+  vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
+         "titulo_projeto","status_projeto","valor_contratado","valor_executado",
+         "nome_agente_financiador","natureza_agente_financiador","modalidade_financiamento",
+         "nome_agente_executor","natureza_agente_executor","uf_ag_executor",
+         "regiao_ag_executor","natureza_financiamento","p&d_ou_demonstracao",
+         names(fapesp2)[str_detect(names(fapesp2),"valor_executado_")],"motor","categorias")
+
 
   fapesp2 <- fapesp2 %>%
-    dplyr::select(id,
-                  fonte_de_dados,
-                  data_assinatura,
-                  data_limite,
-                  duracao_dias,
-                  titulo_projeto,
-                  status_projeto,
-                  valor_contratado,
-                  valor_executado_2013_2025,
-                  nome_agente_financiador,
-                  natureza_agente_financiador,
-                  modalidade_financiamento,
-                  nome_agente_executor,
-                  natureza_agente_executor,
-                  uf_ag_executor,
-                  regiao_ag_executor,
-                  natureza_financiamento,
-                  `p&d_ou_demonstracao`,
-                  valor_executado_2013,valor_executado_2014,
-                  valor_executado_2015,valor_executado_2016,
-                  valor_executado_2017,valor_executado_2018,
-                  valor_executado_2019,valor_executado_2020,
-                  valor_executado_2021,valor_executado_2022,
-                  valor_executado_2023,valor_executado_2024,
-                  valor_executado_2025,
-                  motor,
-                  categorias)
+    dplyr::select(vars)
 
 
   fapesp2 <- dplyr::tibble(fapesp2)

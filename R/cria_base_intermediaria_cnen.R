@@ -13,7 +13,7 @@
 #' cria_base_intermediaria_cnen()
 
 
-cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNEN/Projeto CNEN_Plataforma Inova-E.xlsx") ){
+cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNEN/CNEN_primario_2021_2022.xlsx")){
 
   cnen <- readxl::read_excel(origem_processos,
                      col_types = c("text", "text", "text",
@@ -29,11 +29,6 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
           ) %>%
     func_a(id, data_assinatura, data_limite, valor_contratado)
 
-#  cnen <-func_a(cnen,
-#                data_assinatura = cnen$data_assinatura,
-#                data_limite = cnen$data_limite,
-#                duracao_dias = cnen$duracao_dias,
-#                valor_contratado = cnen$valor_contratado)
 
   cnen<-cnen %>%
     dplyr::mutate(
@@ -46,21 +41,20 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
     natureza_agente_executor        = natureza_do_agente_executor,
     modalidade_financiamento        = modalidade_do_financiamento,
     uf_ag_executor                  = uf_execucao,
-    valor_executado_2013_2025       = gasto_2013_2020,
-    valor_executado_2013            = gasto_2013,
-    valor_executado_2014            = gasto_2014,
-    valor_executado_2015            = gasto_2015,
-    valor_executado_2016            = gasto_2016,
-    valor_executado_2017            = gasto_2017,
-    valor_executado_2018            = gasto_2018,
-    valor_executado_2019            = gasto_2019,
-    valor_executado_2020            = gasto_2020,
-    valor_executado_2021        = gasto_2021,
-    valor_executado_2022        = gasto_2022,
-    valor_executado_2023        = gasto_2023,
-    valor_executado_2024        = gasto_2024,
-    valor_executado_2025        = gasto_2025
-  ) %>%
+    valor_executado                 = gasto_executado
+  )
+
+  names(cnen)=str_replace_all(names(cnen),"gasto_2","valor_executado_2")
+
+  vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
+         "titulo_projeto","status_projeto","valor_contratado","valor_executado",
+         "nome_agente_financiador","natureza_agente_financiador","modalidade_financiamento",
+         "nome_agente_executor","natureza_agente_executor","uf_ag_executor",
+         "regiao_ag_executor","natureza_agente_executor","natureza_financiamento",
+         "modalidade_financiamento",names(cnen)[str_detect(names(cnen),"valor_executado_")],
+         "categorias")
+
+  cnen<-cnen %>%
     dplyr::mutate(regiao_ag_executor = dplyr::recode(uf_ag_executor,
                                        "AC" = "N",
                                        "AL" = "NE",
@@ -86,40 +80,9 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
                                        "SC" = "S",
                                        "SE" = "NE",
                                        "SP" = "SE",
-                                       "TO" = "N"))%>%
-    dplyr::select(
-    id,
-    fonte_de_dados,
-    data_assinatura,data_limite,
-    duracao_dias,
-    titulo_projeto,
-    status_projeto,
-    valor_contratado,
-    valor_executado_2013_2025,
-    nome_agente_financiador,
-    natureza_agente_financiador,
-    modalidade_financiamento,
-    nome_agente_executor,
-    natureza_agente_executor,
-    uf_ag_executor,
-    regiao_ag_executor,
-    natureza_agente_executor,
-    natureza_financiamento,
-    modalidade_financiamento,
-    valor_executado_2013,
-    valor_executado_2014,
-    valor_executado_2015,
-    valor_executado_2016,
-    valor_executado_2017,
-    valor_executado_2018,
-    valor_executado_2019,
-    valor_executado_2020,
-    valor_executado_2021,
-    valor_executado_2022,
-    valor_executado_2023,
-    valor_executado_2024,
-    valor_executado_2025,
-    categorias) %>% tibble()
+                                       "TO" = "N")) %>%
+    dplyr::select(vars) %>%
+    tibble()
 
     cnen
 }

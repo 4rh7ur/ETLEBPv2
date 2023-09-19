@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' cria_base_intermediaria_bndes()
-cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BNDES/naoautomaticas.xlsx")) {
+cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BNDES/BNDESnaoautomaticas2023.xlsx")) {
 
 
   bndes <- readxl::read_excel(origem_processos, skip = 4)%>%
@@ -34,12 +34,6 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
     tidyr::drop_na(valor_contratado_r) %>%
     unique()
 
-  #Old Func
-#  bndes <- func_a(bndes,
-#                  data_assinatura = bndes$data_da_contratacao,
-#                  data_limite = bndes$prazo_utilizacao,
-#                  duracao_dias = bndes$prazo_decorrido_dias,
-#                  valor_contratado = bndes$valor_contratado_r)
 
  bndes <- func_a(df = bndes,
                processo = numero_do_contrato2,
@@ -92,7 +86,7 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
     duracao_meses                  = prazo_execucao_meses,
     duracao_anos                   = prazo_decorrido_anos,
     valor_contratado               = valor_contratado_r,
-    valor_executado_2013_2025      = gasto_2013_2020,
+    valor_executado                = gasto_executado,
     nome_agente_financiador     = "Bndes",
     natureza_agente_financiador = "empresa pública",
     natureza_financiamento      = "pública",
@@ -100,58 +94,22 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
     nome_agente_executor        = cliente,
     natureza_agente_executor    = natureza_do_cliente,
     'p&d_ou_demonstracao'          = NA ,
-    uf_ag_executor                  = uf,
-    valor_executado_2013            = gasto_2013,
-    valor_executado_2014            = gasto_2014,
-    valor_executado_2015            = gasto_2015,
-    valor_executado_2016            = gasto_2016,
-    valor_executado_2017            = gasto_2017,
-    valor_executado_2018            = gasto_2018,
-    valor_executado_2019            = gasto_2019,
-    valor_executado_2020            = gasto_2020,
-    valor_executado_2021        = gasto_2021,
-    valor_executado_2022        = gasto_2022,
-    valor_executado_2023        = gasto_2023,
-    valor_executado_2024        = gasto_2024,
-    valor_executado_2025        = gasto_2025)
+    uf_ag_executor                  = uf)
+
+  names(bndes)=str_replace_all(names(bndes),"gasto_2","valor_executado_2")
+
+  vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
+         "titulo_projeto","status_projeto","valor_contratado","valor_executado",
+         "nome_agente_financiador","natureza_agente_financiador","modalidade_financiamento",
+         "nome_agente_executor","natureza_agente_executor","uf_ag_executor",
+         "regiao_ag_executor","natureza_agente_executor","natureza_financiamento",
+         'p&d_ou_demonstracao',"modalidade_financiamento",
+         names(bndes)[str_detect(names(bndes),"valor_executado_")],"motor","categorias")
 
 
 
   bndes <- bndes%>%
-    dplyr::select(
-    id,
-    fonte_de_dados,
-    data_assinatura,data_limite,
-    duracao_dias,
-    titulo_projeto,
-    status_projeto,
-    valor_contratado,
-    valor_executado_2013_2025,
-    nome_agente_financiador,
-    natureza_agente_financiador,
-    modalidade_financiamento,
-    nome_agente_executor,
-    natureza_agente_executor,
-    uf_ag_executor,
-    regiao_ag_executor,
-    natureza_agente_executor,
-    natureza_financiamento,
-    'p&d_ou_demonstracao',
-    modalidade_financiamento,
-    valor_executado_2013,
-    valor_executado_2014,
-    valor_executado_2015,
-    valor_executado_2016,
-    valor_executado_2017,
-    valor_executado_2018,
-    valor_executado_2019,
-    valor_executado_2020,
-    valor_executado_2021,valor_executado_2022,
-    valor_executado_2023,valor_executado_2024,
-    valor_executado_2025,
-    motor,
-    categorias
-    )
+    dplyr::select(vars)
 
 
 

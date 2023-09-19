@@ -22,7 +22,6 @@ func_a<-function(df,
                valor_projeto){
 
   ano_inicio <- 2013
-  #ano_fim <- unique(lubridate::year(max({{prazo_utilizacao}})))
   ano_fim <- unlist(df %>% mutate(year=lubridate::year({{prazo_utilizacao}})) %>% filter(year==max(year))%>%
                       dplyr::select(year) %>% unique())
 
@@ -94,7 +93,7 @@ func_a<-function(df,
     data <- data %>%
       mutate(proxy = ifelse({{data_inicio}} == {{prazo_utilizacao}} & gasto_executado == 0, "sim", "não"),
              gasto_executado = ifelse(proxy == "sim" , {{valor_projeto}}, gasto_executado)) %>%
-      mutate_at(vars(starts_with("gasto_2")),funs(ifelse(proxy == "sim",valor_projeto,.)))
+      mutate_at(vars(starts_with("gasto_2")),funs(ifelse(proxy == "sim",{{valor_projeto}},.)))
 
     data
 

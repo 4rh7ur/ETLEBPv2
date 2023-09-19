@@ -12,11 +12,11 @@
 #'
 #' @examples
 #' cria_base_intermediaria_finep()
-cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FINEP/14_09_2021_Liberacoes.ods")){
+cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FINEP/LiberacaoFINEP2023.ods")){
 
   finep <- readODS::read_ods(path = origem_processos,
                     skip = 4,
-                    sheet = 1)
+                    sheet = "Projetos_Finep")
 
   names(finep)<-finep[1,]
 
@@ -38,14 +38,6 @@ cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FI
     dplyr::filter(
     prazo_utilizacao >= "2013-01-01") %>%
     tidyr::drop_na(valor_finep)
-
-
-   #Old func
-#  finep <- func_a(finep,
-#                  data_assinatura = finep$data_assinatura ,
-#                  data_limite = finep$prazo_utilizacao,
-#                  duracao_dias = finep$periodo_dias,
-#                  valor_contratado = finep$valor_liberado)
 
   finep <- func_a(df = finep,
                 processo = contrato2,
@@ -104,58 +96,20 @@ cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FI
         natureza_agente_executor       = "Empresa Privada", #confirmar natureza juridica proponente
         'p&d_ou_demonstracao'          = "Demonstração",
         uf_ag_executor                 = uf,
-        valor_executado_2013_2025      = gasto_2013_2020,
-        valor_executado_2013           = gasto_2013,
-        valor_executado_2014           = gasto_2014,
-        valor_executado_2015           = gasto_2015,
-        valor_executado_2016           = gasto_2016,
-        valor_executado_2017           = gasto_2017,
-        valor_executado_2018           = gasto_2018,
-        valor_executado_2019           = gasto_2019,
-        valor_executado_2020           = gasto_2020,
-        valor_executado_2021        = gasto_2021,
-        valor_executado_2022        = gasto_2022,
-        valor_executado_2023        = gasto_2023,
-        valor_executado_2024        = gasto_2024,
-        valor_executado_2025        = gasto_2025)
+        valor_executado               = gasto_executado)
 
+    names(finep)=str_replace_all(names(finep),"gasto_2","valor_executado_2")
+
+    vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
+          "titulo_projeto","status_projeto","valor_contratado","valor_executado",
+          "nome_agente_financiador","natureza_financiamento","natureza_agente_financiador",
+          "modalidade_financiamento","nome_agente_executor","natureza_agente_executor",
+          "uf_ag_executor","regiao_ag_executor","p&d_ou_demonstracao",
+          names(finep)[str_detect(names(finep),"valor_executado_")],"motor","categorias")
 
 
   finep <- finep %>%
-    dplyr::select(id,
-           fonte_de_dados,
-           data_assinatura,
-           data_limite,
-           duracao_dias,
-           titulo_projeto,
-           status_projeto,
-           valor_contratado,
-           valor_executado_2013_2025,
-           nome_agente_financiador,
-           natureza_financiamento,
-           natureza_agente_financiador,
-           modalidade_financiamento,
-           nome_agente_executor,
-           natureza_agente_executor,
-           uf_ag_executor,
-           regiao_ag_executor,
-           `p&d_ou_demonstracao`,
-           valor_executado_2013,
-           valor_executado_2014,
-           valor_executado_2015,
-           valor_executado_2016,
-           valor_executado_2017,
-           valor_executado_2018,
-           valor_executado_2019,
-           valor_executado_2020,
-           valor_executado_2021,valor_executado_2022,
-           valor_executado_2023,valor_executado_2024,
-           valor_executado_2025,
-           motor,
-           categorias
-    )
+    dplyr::select(vars)
 
-
-
-finep
+  finep
 }

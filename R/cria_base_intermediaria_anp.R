@@ -16,8 +16,7 @@ cria_base_intermediaria_anp <- function(origem_processos = here::here("data/ANP/
                                         #origem_enriquecimento = here::here("data/ANP/4.anp.csv")
                                         ) {
 
-  anp <- readr::read_delim(origem_processos,
-                         ";", escape_double = FALSE, trim_ws = TRUE) %>%
+  anp <- readr::read_delim(origem_processos,";", escape_double = FALSE, trim_ws = TRUE) %>%
               janitor::clean_names()
 
   anp <- anp %>%
