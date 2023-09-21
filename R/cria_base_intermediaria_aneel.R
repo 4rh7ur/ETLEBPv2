@@ -67,6 +67,9 @@ cria_base_intermediaria_aneel <- function(
                                                         "character(0" = "nenhuma categoria encontrada"))
 
    anel_pd <- anel_pd %>%
+     mutate('p&d_ou_demonstracao' = ifelse(str_detect(sig_fas_inovacao_projeto,paste(c("CS","LP","IM"), collapse = "|")),1,0))
+
+   anel_pd <- anel_pd %>%
     dplyr::mutate(
            id                          = paste("ANEEL", cod_proj, sep = "-"),
            fonte_de_dados              = "ANEEL",
@@ -82,7 +85,6 @@ cria_base_intermediaria_aneel <- function(
            modalidade_financiamento    = "Não se Aplica",
            nome_agente_executor        = proponente,
            natureza_agente_executor    = "Empresa Privada", # confirmar
-           'p&d_ou_demonstracao'       = NA,
            titulo_projeto              = titulo,
            status_projeto              = situacao
     )
