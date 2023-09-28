@@ -25,7 +25,7 @@ executa_tratamento_incremental <- function(df, sqlite){
   tbl_dm_projeto <- tbl_dm_projeto %>% mutate(título = stringr::str_trim(título))
 
   data <- data %>%
-    dplyr::mutate(existe = ifelse(titulo_projeto %in% tbl_dm_projeto$'título',
+    dplyr::mutate(existe = ifelse(id %in% tbl_dm_projeto$id_item,
                                   "sim",
                                   "não"))
 
