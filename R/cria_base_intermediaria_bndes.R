@@ -20,6 +20,7 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
 
   bndes <- bndes %>%
     dplyr::mutate(
+           prazo_amortizacao_meses=ifelse(modalidade_de_apoio=="NÃO REEMBOLSÁVEL",12,prazo_amortizacao_meses),
            prazo_execucao_meses  = as.numeric(prazo_carencia_meses) + as.numeric(prazo_amortizacao_meses),
            data_da_contratacao   = lubridate::ymd(data_da_contratacao),
            motor = tolower(stringi::stri_trans_general(descricao_do_projeto, "Latin-ASCII")),
@@ -28,7 +29,8 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
            prazo_decorrido_dias  = lubridate::time_length(prazo_utilizacao- data_da_contratacao, "days"),
            numero_do_contrato2    = paste(numero_do_contrato, 1:nrow(bndes))
 
-    )%>%
+    ) %>%
+    dplyr::mutate(prazo_decorrido_anos=ifelse(modalidade_de_apoio=="NÃO REEMBOLSÁVEL",1,prazo_decorrido_anos)) %>%
     dplyr::filter(prazo_utilizacao >= "2013-01-01",
            inovacao         == "SIM") %>%
     tidyr::drop_na(valor_contratado_r) %>%

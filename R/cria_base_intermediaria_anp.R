@@ -61,7 +61,7 @@ anp <- valida_termos_anp(anp, anp$categorias)
     nome_agente_financiador     = empresa_responsavel,
     natureza_agente_financiador = "Empresa Privada", # confirmar
     natureza_financiamento      = "publicamente orientado",
-    modalidade_financiamento    = NA,
+    modalidade_financiamento    = ifelse(str_detect(toupper(qualificacao,paste("UNIDADE PILOTO","PROTÓTIPO",collapse = "|"))),1,0),
     nome_agente_executor        = executor_1,
     natureza_agente_executor    = 'Empresa Privada', # confirmar
     'p&d_ou_demonstracao'       = NA,
