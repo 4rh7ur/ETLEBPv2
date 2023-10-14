@@ -14,8 +14,23 @@
 cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BNDES/BNDESnaoautomaticas2023.xlsx")) {
 
 
-  bndes <- readxl::read_excel(origem_processos, skip = 4)%>%
-           janitor::clean_names()
+  bndes <- readxl::read_excel(origem_processos, skip = 4) %>%
+    janitor::clean_names() %>%
+    filter(inovacao=="SIM") %>%
+    mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r)) %>%
+    group_by(id) %>%
+    summarise(valor_contratado_r=sum(valor_contratado_r,na.rm=T),
+              cnpj=unique(cnpj),
+              uf=unique(uf),
+              numero_do_contrato=unique(numero_do_contrato),
+              data_da_contratacao=unique(data_da_contratacao),
+              prazo_amortizacao_meses=unique(prazo_amortizacao_meses),
+              prazo_carencia_meses=unique(prazo_carencia_meses),
+              modalidade_de_apoio=unique(modalidade_de_apoio),
+              descricao_do_projeto=unique(descricao_do_projeto),
+              situacao_do_contrato=unique(situacao_do_contrato),
+              cliente=unique(cliente),
+              natureza_do_cliente=unique(natureza_do_cliente))
 
 
   bndes <- bndes %>%
@@ -31,8 +46,7 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
 
     ) %>%
     dplyr::mutate(prazo_decorrido_anos=ifelse(modalidade_de_apoio=="NÃO REEMBOLSÁVEL",1,prazo_decorrido_anos)) %>%
-    dplyr::filter(prazo_utilizacao >= "2013-01-01",
-           inovacao         == "SIM") %>%
+    dplyr::filter(prazo_utilizacao >= "2013-01-01") %>%
     tidyr::drop_na(valor_contratado_r) %>%
     unique()
 
@@ -77,9 +91,8 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
 
 
   bndes <- bndes %>% dplyr::mutate(
-    id                           = paste("BNDES",
-                                         numero_do_contrato, sep = "-"),
-    titulo_projeto = descricao_do_projeto,
+    id                             = paste("BNDES",id, sep = "-"),
+    titulo_projeto                 = descricao_do_projeto,
     fonte_de_dados                 = "BNDES",
     data_assinatura                = data_da_contratacao,
     data_limite                    = prazo_utilizacao,
