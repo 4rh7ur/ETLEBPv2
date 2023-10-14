@@ -17,7 +17,7 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
   bndes <- readxl::read_excel(origem_processos, skip = 4) %>%
     janitor::clean_names() %>%
     filter(inovacao=="SIM") %>%
-    mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r)) %>%
+    mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r,produto)) %>%
     group_by(id) %>%
     summarise(valor_contratado_r=sum(valor_contratado_r,na.rm=T),
               cnpj=unique(cnpj),
@@ -30,7 +30,8 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
               descricao_do_projeto=unique(descricao_do_projeto),
               situacao_do_contrato=unique(situacao_do_contrato),
               cliente=unique(cliente),
-              natureza_do_cliente=unique(natureza_do_cliente))
+              natureza_do_cliente=unique(natureza_do_cliente),
+              produto=unique(produto))
 
 
   bndes <- bndes %>%
@@ -108,7 +109,7 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
     modalidade_financiamento    = modalidade_de_apoio,
     nome_agente_executor        = cliente,
     natureza_agente_executor    = natureza_do_cliente,
-    'p&d_ou_demonstracao'          = NA ,
+    'p&d_ou_demonstracao'          = ifelse(str_detect(produto,"FINEM"),0,1),
     uf_ag_executor                  = uf)
 
   names(bndes)=str_replace_all(names(bndes),"gasto_2","valor_executado_2")
