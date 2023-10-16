@@ -12,7 +12,7 @@
 #' executa_carga_incremental(df_validado_bndes, diretorio_sqlite)
 #' executa_carga_incremental(df_validado_cnen, diretorio_sqlite)
 executa_carga_incremental <- function(df, sqlite){
-  data <- {{df}}
+  data <- read.csv2({{df}})
   fonte <- {{sqlite}}
 
   con <- DBI::dbConnect(RSQLite::SQLite(),
