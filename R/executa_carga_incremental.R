@@ -37,11 +37,8 @@ executa_carga_incremental <- function(df, sqlite){
                                     4.1, 4.2, 4.9,
                                     5.1, 5.2, 5.9,
                                     6.1, 6.2, 6.3, 6.9,
-                                    7.1, 7.2, 7.3) ,
-      !abjutils::rm_accent(titulo_projeto) %in% abjutils::rm_accent(
-        stringr::str_squish(tbl_dm_projeto$título)
-      )
-    )  %>%
+                                    7.1, 7.2, 7.3),
+      !id %in% tbl_dm_projeto$id_item)  %>%
 
     dplyr::select(
       nome_agente_executor,
