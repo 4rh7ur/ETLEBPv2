@@ -12,7 +12,7 @@
 #' executa_carga_incremental(df_validado_bndes, diretorio_sqlite)
 #' executa_carga_incremental(df_validado_cnen, diretorio_sqlite)
 executa_carga_incremental <- function(df, sqlite){
-  data <- read.csv2({{df}})
+  data <- {{df}}
   fonte <- {{sqlite}}
 
   con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -84,10 +84,7 @@ executa_carga_incremental <- function(df, sqlite){
                                     5.1, 5.2, 5.9,
                                     6.1, 6.2, 6.3, 6.9,
                                     7.1, 7.2, 7.3) ,
-      !abjutils::rm_accent(titulo_projeto) %in% abjutils::rm_accent(
-        stringr::str_squish(tbl_dm_projeto$título)
-      )
-    )  %>%
+                  !id %in% tbl_dm_projeto$id_item)  %>%
     dplyr::select(
       id, data_assinatura,
       data_limite,titulo_projeto,status_projeto)
@@ -131,23 +128,11 @@ executa_carga_incremental <- function(df, sqlite){
                                     4.1, 4.2, 4.9,
                                     5.1, 5.2, 5.9,
                                     6.1, 6.2, 6.3, 6.9,
-                                    7.1, 7.2, 7.3) ,
-      !abjutils::rm_accent(titulo_projeto) %in% abjutils::rm_accent(
-        stringr::str_squish(tbl_dm_projeto$título)
-        )
-      ) %>%
-    dplyr::select(id, valor_executado_2013:valor_executado_2020) %>%
+                                    7.1, 7.2, 7.3),
+                  !id %in% tbl_dm_projeto$id_item) %>%
+    dplyr::select(id, starts_with("valor_executado_")) %>%
     tidyr::gather(ano, vlr, -id) %>%
-    dplyr::mutate(
-      ano = dplyr::recode(ano,
-                          "valor_executado_2013" = 2013,
-                          "valor_executado_2014" = 2014,
-                          "valor_executado_2015" = 2015,
-                          "valor_executado_2016" = 2016,
-                          "valor_executado_2017" = 2017,
-                          "valor_executado_2018" = 2018,
-                          "valor_executado_2019" = 2019,
-                          "valor_executado_2020" = 2020)) %>%
+    dplyr::mutate(ano = as.numeric(str_replace_all(ano,"valor_executado_",""))) %>%
     dplyr::rename(id_item = id)
 
   bs_res <- data %>%
@@ -157,11 +142,8 @@ executa_carga_incremental <- function(df, sqlite){
                                     4.1, 4.2, 4.9,
                                     5.1, 5.2, 5.9,
                                     6.1, 6.2, 6.3, 6.9,
-                                    7.1, 7.2, 7.3)  ,
-      !abjutils::rm_accent(titulo_projeto) %in% abjutils::rm_accent(
-        stringr::str_squish(tbl_dm_projeto$título)
-      )
-    ) %>%
+                                    7.1, 7.2, 7.3),
+                  !id %in% tbl_dm_projeto$id_item) %>%
     dplyr::mutate(categorias = as.character(categorias)) %>%
     dplyr::select(id, natureza_agente_financiador,
                   data_assinatura,categorias,nome_agente_executor,

@@ -72,6 +72,7 @@ cria_base_intermediaria_aneel <- function(
    anel_pd <- anel_pd %>%
     dplyr::mutate(
            id                          = paste("ANEEL", cod_proj, sep = "-"),
+           uf_ag_executor              = NA,
            fonte_de_dados              = "ANEEL",
            data_assinatura             = data_de_carregamento,
            data_limite                 = data_de_conclusao,
@@ -92,7 +93,7 @@ cria_base_intermediaria_aneel <- function(
   names(anel_pd)=str_replace_all(names(anel_pd),"gasto_2","valor_executado_2")
 
   vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
-         "titulo_projeto","status_projeto","valor_contratado","valor_executado",
+         "titulo_projeto","status_projeto","valor_contratado","valor_executado","uf_ag_executor",
          "nome_agente_financiador","natureza_agente_financiador","modalidade_financiamento",
          "nome_agente_executor","natureza_agente_executor","natureza_financiamento","p&d_ou_demonstracao",
          names(anel_pd)[str_detect(names(anel_pd),"valor_executado_")],"motor","categorias")
