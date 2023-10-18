@@ -109,7 +109,9 @@ cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BN
     modalidade_financiamento    = modalidade_de_apoio,
     nome_agente_executor        = cliente,
     natureza_agente_executor    = natureza_do_cliente,
-    'p&d_ou_demonstracao'          = ifelse(str_detect(produto,"FINEM"),0,1),
+    'p&d_ou_demonstracao'          = case_when(str_detect(produto,"FINEM") ~ 0,
+                                               produto=="" ~ 9,
+                                               TRUE ~ 1),
     uf_ag_executor                  = uf)
 
   names(bndes)=str_replace_all(names(bndes),"gasto_2","valor_executado_2")

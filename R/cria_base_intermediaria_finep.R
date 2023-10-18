@@ -44,6 +44,7 @@ cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FI
                 data_inicio = data_assinatura,
                 prazo_utilizacao = prazo_utilizacao,
                 valor_projeto = valor_finep)
+
   finep <- dtc_categorias(finep,processo = contrato2, motor = motor)
   finep <- finep %>% dplyr::mutate(
     categorias = dplyr::recode(categorias,
@@ -94,7 +95,10 @@ cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FI
         modalidade_financiamento       = instrumento,
         nome_agente_executor           = proponente,
         natureza_agente_executor       = "Empresa Privada", #confirmar natureza juridica proponente
-        'p&d_ou_demonstracao'          = "Demonstração",
+        'p&d_ou_demonstracao'          = case_when(
+                                            str_detect(toupper(instrumento),paste(c("NÃO REEMBOLSÁVEL","SUBVENÇÃO"),collapse = "|")) ~ 0,
+                                            instrumento == "" ~ 9,
+                                            TRUE ~ 1),
         uf_ag_executor                 = uf,
         valor_executado               = gasto_executado)
 

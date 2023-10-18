@@ -217,8 +217,7 @@ executa_carga_incremental <- function(df, sqlite){
         "Empresa economia mista" =1,
         "Fundação de Amparo (FAP)" = 1,
         "ICT pública" =1,
-        "ONU" =0,
-        "Sem informação"=NA),
+        "ONU" =0),
       chamada = NA,
       id_disp = inicio:fim
     ) %>%

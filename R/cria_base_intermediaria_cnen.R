@@ -36,12 +36,13 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
     status_projeto                  = NA,
     nome_agente_financiador         = "Sem informação",
     nome_agente_executor            = nome_do_agente_executor,
-    natureza_agente_financiador     = natureza_do_agente_financiador,
+    natureza_agente_financiador     = ifelse(is.na(natureza_do_agente_financiador),"sem informação",natureza_do_agente_financiador),
     natureza_financiamento          = natureza_do_financiamento,
     natureza_agente_executor        = natureza_do_agente_executor,
     modalidade_financiamento        = modalidade_do_financiamento,
     uf_ag_executor                  = uf_execucao,
-    valor_executado                 = gasto_executado
+    valor_executado                 = gasto_executado,
+    `p&d_ou_demonstracao`           = 9
   )
 
   names(cnen)=str_replace_all(names(cnen),"gasto_2","valor_executado_2")
@@ -49,7 +50,7 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
   vars=c("id","fonte_de_dados","data_assinatura","data_limite","duracao_dias",
          "titulo_projeto","status_projeto","valor_contratado","valor_executado",
          "nome_agente_financiador","natureza_agente_financiador","modalidade_financiamento",
-         "nome_agente_executor","natureza_agente_executor","uf_ag_executor",
+         "nome_agente_executor","natureza_agente_executor","uf_ag_executor","p&d_ou_demonstracao",
          "regiao_ag_executor","natureza_agente_executor","natureza_financiamento",
          "modalidade_financiamento",names(cnen)[str_detect(names(cnen),"valor_executado_")],
          "categorias")
