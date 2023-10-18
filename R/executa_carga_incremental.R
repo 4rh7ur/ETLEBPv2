@@ -69,7 +69,7 @@ executa_carga_incremental <- function(df, sqlite){
   fim<-(inicio+nrow(dm_agente_empresa)-1)
 
   dm_agente_empresa <- dm_agente_empresa %>%
-    dplyr::mutate(id_agente = inicio:fim,)
+    dplyr::mutate(id_agente = inicio:fim)
 
   DBI::dbExecute(con, 'INSERT INTO dm_agente_empresa (id_agente, nme_agente,ntz_agente, uf, municipio, cnpj)
           VALUES (:id_agente, :nme_agente, :ntz_agente, :uf, :municipio, :cnpj);', dm_agente_empresa)
@@ -217,7 +217,8 @@ executa_carga_incremental <- function(df, sqlite){
         "Empresa economia mista" =1,
         "Fundação de Amparo (FAP)" = 1,
         "ICT pública" =1,
-        "ONU" =0),
+        "ONU" =0,
+        "Sem informação"=NA),
       chamada = NA,
       id_disp = inicio:fim
     ) %>%

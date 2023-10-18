@@ -34,7 +34,7 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
     dplyr::mutate(
     titulo_projeto                  = titulo,
     status_projeto                  = NA,
-    nome_agente_financiador         = nome_do_agente_financiador,
+    nome_agente_financiador         = "Sem informação",
     nome_agente_executor            = nome_do_agente_executor,
     natureza_agente_financiador     = natureza_do_agente_financiador,
     natureza_financiamento          = natureza_do_financiamento,
