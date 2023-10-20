@@ -203,17 +203,9 @@ executa_carga_completa <- function(df, sqlite){
                                     5.1, 5.2, 5.9,
                                     6.1, 6.2, 6.3, 6.9,
                                     7.1, 7.2, 7.3) ) %>%
-    dplyr::select(id, valor_executado_2013:valor_executado_2020) %>%
+    dplyr::select(id, starts_with("valor_executado_")) %>%
     tidyr::gather(ano, vlr, -id) %>%
-    dplyr::mutate(ano = dplyr::recode(ano,
-                                      "valor_executado_2013" = 2013,
-                                      "valor_executado_2014" = 2014,
-                                      "valor_executado_2015" = 2015,
-                                      "valor_executado_2016" = 2016,
-                                      "valor_executado_2017" = 2017,
-                                      "valor_executado_2018" = 2018,
-                                      "valor_executado_2019" = 2019,
-                                      "valor_executado_2020" = 2020)) %>%
+    dplyr::mutate(ano = as.numeric(str_replace_all(ano,"valor_executado_",""))) %>%
     dplyr::rename(id_item = id)
 
 
