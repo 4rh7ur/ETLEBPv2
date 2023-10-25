@@ -67,9 +67,9 @@ cria_base_intermediaria_aneel <- function(
                                                         "character(0" = "nenhuma categoria encontrada"))
 
    anel_pd <- anel_pd %>%
-     mutate('p&d_ou_demonstracao' = case_when(str_detect(sig_fas_inovacao_projeto,paste(c("CS","LP","IM"), collapse = "|") ~ 1,
+     mutate('p&d_ou_demonstracao' = case_when(str_detect(sig_fas_inovacao_projeto,paste(c("CS","LP","IM"), collapse = "|")) ~ 1,
                                                          sig_fas_inovacao_projeto == "" ~ 9,
-                                                         TRUE ~ 0)))
+                                                         TRUE ~ 0))
 
    anel_pd <- anel_pd %>%
     dplyr::mutate(
