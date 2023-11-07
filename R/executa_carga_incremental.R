@@ -238,4 +238,9 @@ executa_carga_incremental <- function(df, sqlite){
                                           id_exec, id_formnt, mod_finan, id_cat2,chamada, id_disp)
           VALUES (:id_item, :ano, :vlr, :ntz_finan, :dta_inicio,
                   :id_exec, :id_formnt, :mod_finan, :id_cat2, :chamada, :id_disp);', bs_res)
+
+  #con2=DBI::dbConnect(RSQLite::SQLite(), ":memory:",dbname = stringr::str_replace_all(fonte,".db","_teste.db"))
+  #RSQLite::sqliteCopyDatabase(to=con2,from=con)
+
+  return(con)
 }

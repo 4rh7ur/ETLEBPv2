@@ -144,7 +144,7 @@ executa_carga_completa <- function(df, sqlite){
                                      6.1, 6.2, 6.3, 6.9,
                                      7.1, 7.2, 7.3) ) %>%
     dplyr::select(id, data_assinatura,
-                  data_limite,titulo_projeto,status_projeto)
+                  data_limite,titulo_projeto,status_projeto,uf_ag_executor)
 
 
   inicio<-(max(mytbl6$id_projeto)+1)
@@ -218,20 +218,21 @@ executa_carga_completa <- function(df, sqlite){
                                     6.1, 6.2, 6.3, 6.9,
                                     7.1, 7.2, 7.3) ) %>%
     dplyr::mutate(categorias = as.character(categorias)) %>%
-    dplyr::select(id, natureza_agente_financiador,
+    dplyr::select(id, natureza_agente_financiador,uf_ag_executor,
                   data_assinatura,categorias,nome_agente_executor,
                   fonte_de_dados, modalidade_financiamento)
 
-  outra<- bs_res %>% dplyr::select(nome_agente_executor) %>%
+  outra<- bs_res %>% dplyr::select(nome_agente_executor,uf_ag_executor) %>%
     na.omit(nome_agente_executor)
 
-  outra<- dplyr::left_join(outra, mytbl1[,c(1,2)],
-                           by = c("nome_agente_executor"="nme_agente")) %>%
+  outra<- dplyr::left_join(outra, mytbl1[,c(1,2,4)],
+                           by = c("nome_agente_executor"="nme_agente","uf_ag_executor"="uf")) %>%
     dplyr::rename(id_exec = id_agente) %>%
     unique()
 
-  bs_res <- dplyr::left_join(bs_res, outra,
-                             ) %>% unique()
+  bs_res <- dplyr::left_join(bs_res, outra,by=c("nome_agente_executor","uf_ag_executor")) %>%
+    unique() %>%
+    filter(!duplicated(id))
 
 
   bs_res <- dplyr::left_join(bs_res, mytbl2[,c(1,3)],
