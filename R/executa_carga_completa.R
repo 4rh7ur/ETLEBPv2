@@ -308,7 +308,7 @@ executa_carga_completa <- function(df, sqlite){
   #id_prop e id_finan e id_exec medem a mesma coisa
   bs_res<-dplyr::left_join(vlr_res, bs_res ) %>% unique()
 
-  bs_res<-bs_res %>% dplyr::select(-nome_agente_executor,-categorias) %>%
+  bs_res<-bs_res %>% dplyr::select(-nome_agente_executor,-categorias,-uf_ag_executor) %>%
     dplyr::mutate(dta_inicio = NA,
                   vlr = as.numeric(vlr),
                   ano = as.integer(ano),
