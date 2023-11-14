@@ -12,6 +12,7 @@
 #' @examples
 #' cria_base_intermediaria_cnen()
 
+origem_processos="/Users/silvanooliveira/Library/Mobile Documents/com~apple~CloudDocs/Consultoria/CEPAL/ETLEBP2/data/CNEN/Projeto CNEN_extra_2023.xlsx"
 
 cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNEN/CNEN_primario_2021_2022.xlsx")){
 
@@ -32,6 +33,7 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
 
   cnen<-cnen %>%
     dplyr::mutate(
+    id                              = paste("CNEN",id,lubridate::year(data_assinatura),sep = "-"),
     titulo_projeto                  = titulo,
     status_projeto                  = NA,
     nome_agente_financiador         = "Sem informação",
@@ -42,7 +44,9 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
     modalidade_financiamento        = modalidade_do_financiamento,
     uf_ag_executor                  = uf_execucao,
     valor_executado                 = gasto_executado,
-    `p&d_ou_demonstracao`           = 9
+    `p&d_ou_demonstracao`           = case_when(str_detect(p_d_ou_demonstracao,"P&D")~0,
+                                                str_detect(p_d_ou_demonstracao,"Demonstração")~1,
+                                                TRUE ~ 9)
   )
 
   names(cnen)=str_replace_all(names(cnen),"gasto_2","valor_executado_2")
