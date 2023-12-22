@@ -12,7 +12,7 @@
 #' @examples
 #' cria_base_intermediaria_cnen()
 
-origem_processos="/Users/silvanooliveira/Library/Mobile Documents/com~apple~CloudDocs/Consultoria/CEPAL/ETLEBP2/data/CNEN/Projeto CNEN_extra_2023.xlsx"
+#origem_processos="/Users/silvanooliveira/Library/Mobile Documents/com~apple~CloudDocs/Consultoria/CEPAL/ETLEBP2/data/CNEN/Projeto CNEN_extra_2023.xlsx"
 
 cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNEN/CNEN_primario_2021_2022.xlsx")){
 

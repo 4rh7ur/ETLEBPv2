@@ -152,7 +152,7 @@ executa_carga_incremental <- function(df, sqlite){
   outra<- bs_res %>% dplyr::select(nome_agente_executor) %>%
     na.omit(nome_agente_executor) %>% unique()
 
-  outra<- dplyr::left_join(outra, tbl_agente_empresa[,c(1,2)],
+  outra<- dplyr::left_join(outra, tbl_agente_empresa[!duplicated(tbl_agente_empresa$nme_agente),c(1,2)],
                            by = c("nome_agente_executor"="nme_agente")) %>%
     dplyr::rename(id_exec = id_agente) %>% unique()
 
