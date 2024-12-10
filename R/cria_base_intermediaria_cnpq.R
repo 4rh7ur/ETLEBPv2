@@ -8,7 +8,9 @@
 #'
 #' @examples
 #' cria_base_intermediaria_cnpq()
-cria_base_intermediaria_cnpq<- function(origem_processos = here::here("data/CNPQ/CNPQ_primario_2021.xlsx")){
+cria_base_intermediaria_cnpq<- function(origem_processos
+    # origem_processos = here::here("data/CNPQ/CNPQ_primario_2021.xlsx")
+    ){
 
 
 
@@ -46,8 +48,9 @@ cria_base_intermediaria_cnpq<- function(origem_processos = here::here("data/CNPQ
 #---------- Inicio do Tratamento ---------------------------------------------
 
 
-  cnpq<-readxl::read_excel(path = origem_processos,sheet = 1, skip = 6) %>%
-    janitor::clean_names()
+  cnpq<-origem_processos
+    # readxl::read_excel(path = origem_processos,sheet = 1, skip = 6) %>%
+    # janitor::clean_names()
 
 
   cnpq <- cnpq %>%

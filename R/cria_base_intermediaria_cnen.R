@@ -14,15 +14,18 @@
 
 #origem_processos="/Users/silvanooliveira/Library/Mobile Documents/com~apple~CloudDocs/Consultoria/CEPAL/ETLEBP2/data/CNEN/Projeto CNEN_extra_2023.xlsx"
 
-cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNEN/CNEN_primario_2021_2022.xlsx")){
+cria_base_intermediaria_cnen <- function(origem_processos
+    # origem_processos = here::here("data/CNEN/CNEN_primario_2021_2022.xlsx")
+    ){
 
-  cnen <- readxl::read_excel(origem_processos,
-                     col_types = c("text", "text", "text",
-                                   "text", "date", "date", "text", "numeric",
-                                   "text", "text", "text", "text", "text",
-                                   "text", "text", "text", "text", "text")) %>%
-    janitor::clean_names() %>%
-    dplyr::slice(-c(1,2,3)) %>%
+  cnen <- origem_processos %>%
+    # readxl::read_excel(origem_processos,
+    #                  col_types = c("text", "text", "text",
+    #                                "text", "date", "date", "text", "numeric",
+    #                                "text", "text", "text", "text", "text",
+    #                                "text", "text", "text", "text", "text")) %>%
+    # janitor::clean_names() %>%
+    # dplyr::slice(-c(1,2,3)) %>%
     dplyr::mutate(data_assinatura = lubridate::ymd(data_assinatura),
            data_limite     = lubridate::ymd(data_limite),
            duracao_dias    = lubridate::time_length(data_limite - data_assinatura, "days"),
@@ -31,9 +34,10 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
     func_a(id, data_assinatura, data_limite, valor_contratado)
 
 
-  cnen<-cnen %>%
+  cnen <- cnen %>%
     dplyr::mutate(
     id                              = paste("CNEN",id,lubridate::year(data_assinatura),sep = "-"),
+    fonte_de_dados                  = "CNEN",
     titulo_projeto                  = titulo,
     status_projeto                  = NA,
     nome_agente_financiador         = "Sem informação",
@@ -59,7 +63,7 @@ cria_base_intermediaria_cnen <- function(origem_processos = here::here("data/CNE
          "modalidade_financiamento",names(cnen)[str_detect(names(cnen),"valor_executado_")],
          "categorias")
 
-  cnen<-cnen %>%
+  cnen <- cnen %>%
     dplyr::mutate(regiao_ag_executor = dplyr::recode(uf_ag_executor,
                                        "AC" = "N",
                                        "AL" = "NE",

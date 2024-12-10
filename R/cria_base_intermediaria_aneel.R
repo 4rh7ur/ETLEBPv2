@@ -14,8 +14,8 @@
 #'
 #' @examples
 #' cria_base_intermediaria_aneel()
-cria_base_intermediaria_aneel <- function(
-  origem_processos = here::here("data/SGPED_BI/ANEEL_proj-ped-energia-eletrica.csv")
+cria_base_intermediaria_aneel <- function(origem_processos
+  # origem_processos = here::here("data/SGPED_BI/ANEEL_proj-ped-energia-eletrica.csv")
   #origem_equipes = here::here("data/SGPED_BI/5.PD RF EQUIPE.csv")
 ){
 
@@ -24,8 +24,9 @@ cria_base_intermediaria_aneel <- function(
   ##get the data ##
 
   #importando o dataset
-  anel_pd <- read.csv2(origem_processos,encoding = "latin1") %>%
-    janitor::clean_names()
+  anel_pd <- origem_processos
+    # read.csv2(origem_processos,encoding = "latin1") %>%
+    # janitor::clean_names()
 
   anel_pd <- anel_pd %>%
     mutate(data_de_carregamento = as.Date(paste0(ano_cadastro_proposta_projeto,"-01-01")),

@@ -11,11 +11,14 @@
 #'
 #' @examples
 #' cria_base_intermediaria_bndes()
-cria_base_intermediaria_bndes <- function(origem_processos = here::here("data/BNDES/BNDESnaoautomaticas2023.xlsx")) {
+cria_base_intermediaria_bndes <- function(origem_processos
+    # origem_processos = here::here("data/BNDES/BNDESnaoautomaticas2023.xlsx")
+    ) {
 
 
-  bndes <- readxl::read_excel(origem_processos, skip = 4) %>%
-    janitor::clean_names() %>%
+  bndes <- origem_processos %>%
+    # readxl::read_excel(origem_processos, skip = 4) %>%
+    # janitor::clean_names() %>%
     filter(inovacao=="SIM") %>%
     mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r,produto)) %>%
     group_by(id) %>%

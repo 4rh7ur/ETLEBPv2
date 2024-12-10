@@ -32,7 +32,7 @@ executa_tratamento_completo <- function(df, sqlite){
                      data$fonte_de_dados[1] == "CNPQ" ~ 9,
                      data$fonte_de_dados[1] == "FAPESP" ~ 10,
                      data$fonte_de_dados[1] == "ANP" ~ 11,
-                     data$fonte_de_dados[1] == "CNEM" ~ 12)
+                     data$fonte_de_dados[1] == "CNEN" ~ 12)
 
   #inserir categorias IEA do sqlite na base
 

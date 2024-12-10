@@ -12,15 +12,18 @@
 #'
 #' @examples
 #' cria_base_intermediaria_finep()
-cria_base_intermediaria_finep <- function(origem_processos = here::here("data/FINEP/LiberacaoFINEP2023.ods")){
+cria_base_intermediaria_finep <- function(origem_processos
+    # origem_processos = here::here("data/FINEP/LiberacaoFINEP2023.ods")
+    ){
 
-  finep <- readODS::read_ods(path = origem_processos,
-                    skip = 4,
-                    sheet = "Projetos_Finep")
+  # finep <- readODS::read_ods(path = origem_processos,
+  #                   skip = 4,
+  #                   sheet = "Projetos_Finep")
+  finep <- origem_processos
 
-  names(finep)<-finep[1,]
-
-  finep <- finep %>% janitor::clean_names()%>% dplyr::slice(-1)
+  # names(finep)<-finep[1,]
+  #
+  # finep <- finep %>% janitor::clean_names()%>% dplyr::slice(-1)
 
 
   finep <- finep %>% dplyr::mutate(
