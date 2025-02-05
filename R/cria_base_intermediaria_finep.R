@@ -30,7 +30,7 @@ cria_base_intermediaria_finep <- function(origem_processos
     motor            = tolower(stringi::stri_trans_general(titulo, "Latin-ASCII")),
     valor_finep      = as.numeric(valor_finep),
     valor_liberado   = as.numeric(valor_liberado),
-    data_liberacao   = lubridate::ymd(lubridate::dmy(data_liberacao)),
+    #data_liberacao   = lubridate::ymd(lubridate::dmy(data_liberacao)),
     data_assinatura  = lubridate::ymd(lubridate::dmy(data_assinatura)),
     prazo_utilizacao = lubridate::ymd(lubridate::dmy(prazo_utilizacao)),
     periodo_meses    = lubridate::time_length(prazo_utilizacao- data_assinatura, "months"),
