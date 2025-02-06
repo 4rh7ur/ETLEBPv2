@@ -66,7 +66,7 @@ cria_base_intermediaria_anp <- function(origem_processos
       valor_projeto       = as.numeric(stringr::str_replace_all(
 
                              stringr::str_remove_all(valor_clausula, "[R$ ]"), "[,]", "")),
-      data_inicio          = lubridate::ymd(data_inicio),
+      data_inicio          = lubridate::ymd(as.Date(data_inicio)),
       prazo_utilizacao     = data_inicio + months(prazo), #precisei mudar o nome dessa variável
       prazo_decorrido_dias = lubridate::time_length(prazo_utilizacao - data_inicio, "days"),
       prazo_decorrido_anos = as.integer(prazo_decorrido_dias/365),

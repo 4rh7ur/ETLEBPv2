@@ -15,6 +15,36 @@ cria_base_intermediaria_bndes <- function(origem_processos
     # origem_processos = here::here("data/BNDES/BNDESnaoautomaticas2023.xlsx")
     ) {
 
+  ajustar_separador_decimal <- function(x) {
+    # Verifica se há ponto e/ou vírgula na string
+    has_point <- grepl("\\.", x)
+    has_comma <- grepl(",", x)
+
+    # Identifica qual separador está por último na string
+    last_separator <- ifelse(grepl("\\.[^,]*$", x), "point",
+                             ifelse(grepl(",[^\\.]*$", x), "comma", NA))
+
+    # Se não houver separador decimal, retorna o valor original
+    if (is.na(last_separator)) {
+      return(x)
+    }
+
+    # Realiza as transformações conforme a condição do último separador decimal
+    if (last_separator == "comma") {
+      if (has_point) {
+        # Caso a vírgula seja o separador decimal e exista ponto, remove ponto e substitui vírgula por ponto
+        x <- gsub("\\.", "", x)  # Remove ponto
+      }
+      x <- gsub(",", ".", x)      # Substitui vírgula por ponto
+    } else if (last_separator == "point" && has_comma) {
+      # Caso o ponto seja o separador decimal e exista vírgula, remove a vírgula
+      x <- gsub(",", "", x)
+    }
+
+    return(x)
+  }
+
+  origem_processos$valor_contratado_r <-sapply(origem_processos$valor_contratado_r, ajustar_separador_decimal)
 
   bndes <- origem_processos %>%
     # readxl::read_excel(origem_processos, skip = 4) %>%

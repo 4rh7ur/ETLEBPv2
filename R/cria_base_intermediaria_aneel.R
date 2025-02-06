@@ -19,6 +19,34 @@ cria_base_intermediaria_aneel <- function(origem_processos
   #origem_equipes = here::here("data/SGPED_BI/5.PD RF EQUIPE.csv")
 ){
 
+  ajustar_separador_decimal <- function(x) {
+    # Verifica se há ponto e/ou vírgula na string
+    has_point <- grepl("\\.", x)
+    has_comma <- grepl(",", x)
+
+    # Identifica qual separador está por último na string
+    last_separator <- ifelse(grepl("\\.[^,]*$", x), "point",
+                             ifelse(grepl(",[^\\.]*$", x), "comma", NA))
+
+    # Se não houver separador decimal, retorna o valor original
+    if (is.na(last_separator)) {
+      return(x)
+    }
+
+    # Realiza as transformações conforme a condição do último separador decimal
+    if (last_separator == "comma") {
+      if (has_point) {
+        # Caso a vírgula seja o separador decimal e exista ponto, remove ponto e substitui vírgula por ponto
+        x <- gsub("\\.", "", x)  # Remove ponto
+      }
+      x <- gsub(",", ".", x)      # Substitui vírgula por ponto
+    } else if (last_separator == "point" && has_comma) {
+      # Caso o ponto seja o separador decimal e exista vírgula, remove a vírgula
+      x <- gsub(",", "", x)
+    }
+
+    return(x)
+  }
 
   options(scipen=999)
   ##get the data ##
@@ -27,6 +55,9 @@ cria_base_intermediaria_aneel <- function(origem_processos
   anel_pd <- origem_processos
     # read.csv2(origem_processos,encoding = "latin1") %>%
     # janitor::clean_names()
+
+  anel_pd$vlr_custo_total_auditado <-sapply(anel_pd$vlr_custo_total_auditado, ajustar_separador_decimal)
+  anel_pd$vlr_custo_total_previsto <-sapply(anel_pd$vlr_custo_total_previsto, ajustar_separador_decimal)
 
   anel_pd <- anel_pd %>%
     mutate(data_de_carregamento = as.Date(paste0(ano_cadastro_proposta_projeto,"-01-01")),
