@@ -44,9 +44,12 @@ cria_base_intermediaria_bndes <- function(origem_processos
     return(x)
   }
 
-  origem_processos$valor_contratado_r <-sapply(origem_processos$valor_contratado_r, ajustar_separador_decimal)
+  bndes <- origem_processos
 
-  bndes <- origem_processos %>%
+  bndes$valor_contratado_r <-sapply(bndes$valor_contratado_r, ajustar_separador_decimal)
+  # origem_processos$valor_contratado_r <-sapply(origem_processos$valor_contratado_r, ajustar_separador_decimal)
+
+  bndes <- bndes %>%
     # readxl::read_excel(origem_processos, skip = 4) %>%
     # janitor::clean_names() %>%
     filter(inovacao=="SIM") %>%
