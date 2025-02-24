@@ -72,7 +72,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
 
   bndes <- bndes %>%
     dplyr::mutate(
-           prazo_amortizacao_meses=ifelse(modalidade_de_apoio=="NÃO REEMBOLSÁVEL",12,prazo_amortizacao_meses),
+           prazo_amortizacao_meses=ifelse(modalidade_de_apoio == "NÃO REEMBOLSÁVEL", 12, prazo_amortizacao_meses),
            #prazo_execucao_meses  = as.numeric(prazo_amortizacao_meses),
            prazo_execucao_meses  = as.numeric(prazo_carencia_meses) + as.numeric(prazo_amortizacao_meses),
            data_da_contratacao   = lubridate::ymd(data_da_contratacao),
@@ -85,7 +85,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
     ) %>%
     dplyr::mutate(prazo_decorrido_anos=ifelse(modalidade_de_apoio=="NÃO REEMBOLSÁVEL",1,prazo_decorrido_anos)) %>%
     dplyr::filter(prazo_utilizacao >= "2013-01-01") %>%
-    tidyr::drop_na(valor_contratado_r) %>%
+    tidyr::drop_na(as.numeric(valor_contratado_r)) %>%
     unique()
 
 
@@ -93,7 +93,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
                processo = numero_do_contrato2,
                data_inicio = data_da_contratacao,
                prazo_utilizacao = prazo_utilizacao,
-               valor_projeto = valor_contratado_r)
+               valor_projeto = as.numeric(valor_contratado_r))
 
  bndes <- dtc_categorias(bndes, numero_do_contrato2, motor)
  bndes <- bndes %>% dplyr::mutate(categorias = dplyr::recode(categorias,
