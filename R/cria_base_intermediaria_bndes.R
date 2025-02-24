@@ -46,7 +46,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
 
   bndes <- origem_processos
 
-  bndes$valor_contratado_r <-sapply(bndes$valor_contratado_r, ajustar_separador_decimal)
+  bndes$valor_contratado_r <-as.numeric(sapply(bndes$valor_contratado_r, ajustar_separador_decimal))
   # origem_processos$valor_contratado_r <-sapply(origem_processos$valor_contratado_r, ajustar_separador_decimal)
 
   bndes <- bndes %>%
@@ -55,7 +55,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
     filter(inovacao=="SIM") %>%
     mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r,produto)) %>%
     group_by(id) %>%
-    summarise(valor_contratado_r=sum(as.numeric(valor_contratado_r),na.rm=T),
+    summarise(valor_contratado_r=sum(valor_contratado_r,na.rm=T),
               cnpj=unique(cnpj),
               uf=unique(uf),
               numero_do_contrato=unique(numero_do_contrato),
@@ -85,7 +85,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
     ) %>%
     dplyr::mutate(prazo_decorrido_anos=ifelse(modalidade_de_apoio=="NÃO REEMBOLSÁVEL",1,prazo_decorrido_anos)) %>%
     dplyr::filter(prazo_utilizacao >= "2013-01-01") %>%
-    tidyr::drop_na(as.numeric(valor_contratado_r)) %>%
+    tidyr::drop_na(valor_contratado_r) %>%
     unique()
 
 
@@ -93,7 +93,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
                processo = numero_do_contrato2,
                data_inicio = data_da_contratacao,
                prazo_utilizacao = prazo_utilizacao,
-               valor_projeto = as.numeric(valor_contratado_r))
+               valor_projeto = valor_contratado_r)
 
  bndes <- dtc_categorias(bndes, numero_do_contrato2, motor)
  bndes <- bndes %>% dplyr::mutate(categorias = dplyr::recode(categorias,
