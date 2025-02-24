@@ -55,7 +55,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
     filter(inovacao=="SIM") %>%
     mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r,produto)) %>%
     group_by(id) %>%
-    summarise(valor_contratado_r=sum(valor_contratado_r,na.rm=T),
+    summarise(valor_contratado_r=sum(as.numeric(valor_contratado_r),na.rm=T),
               cnpj=unique(cnpj),
               uf=unique(uf),
               numero_do_contrato=unique(numero_do_contrato),
