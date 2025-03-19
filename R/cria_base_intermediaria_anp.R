@@ -70,8 +70,8 @@ cria_base_intermediaria_anp <- function(origem_processos
       prazo_utilizacao     = data_inicio + months(prazo), #precisei mudar o nome dessa variável
       prazo_decorrido_dias = lubridate::time_length(prazo_utilizacao - data_inicio, "days"),
       prazo_decorrido_anos = as.integer(prazo_decorrido_dias/365),
-      motor                = stringi::stri_trans_general(paste(titulo, objetivo, tema, subtema),
-                                                         "Latin-ASCII"),
+      motor                = stringi::stri_replace_all_fixed(stringi::stri_trans_general(paste(titulo, objetivo, tema, subtema),
+                                                         "Latin-ASCII"), '"', ''),
       motor                = tolower(motor)
     ) %>%
     dplyr::filter(prazo_utilizacao >= "2013-01-01") %>%
