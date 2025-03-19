@@ -44,6 +44,10 @@ cria_base_intermediaria_bndes <- function(origem_processos
     return(x)
   }
 
+  # Função para remover caracteres que não são números
+  remover_nao_numericos <- function(texto) {
+    return(gsub('[^0-9]', '\\', texto))}
+
   bndes <- origem_processos
 
   bndes$valor_contratado_r <-as.numeric(sapply(bndes$valor_contratado_r, ajustar_separador_decimal))
@@ -52,6 +56,7 @@ cria_base_intermediaria_bndes <- function(origem_processos
   bndes <- bndes %>%
     # readxl::read_excel(origem_processos, skip = 4) %>%
     # janitor::clean_names() %>%
+    mutate(cnpj = remover_nao_numericos(cnpj)) %>%
     filter(inovacao=="SIM") %>%
     mutate(id=paste0(cnpj,uf,numero_do_contrato,data_da_contratacao,prazo_amortizacao_meses,prazo_carencia_meses,valor_contratado_r,produto)) %>%
     group_by(id) %>%
