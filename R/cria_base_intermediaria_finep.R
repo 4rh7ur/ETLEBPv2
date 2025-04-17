@@ -36,6 +36,7 @@ cria_base_intermediaria_finep <- function(origem_processos
     periodo_meses    = lubridate::time_length(prazo_utilizacao- data_assinatura, "months"),
     periodo_dias     = lubridate::time_length(prazo_utilizacao - data_assinatura, "days"),
     periodo_anos     = as.integer(lubridate::time_length(prazo_utilizacao - data_assinatura, "years") ),
+    contrato         = str_sub(as.character(contrato), end = -4),
     contrato2 = paste(contrato, 1:nrow(finep) )
   ) %>%
     dplyr::filter(
