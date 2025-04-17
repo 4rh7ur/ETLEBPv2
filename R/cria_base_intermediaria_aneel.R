@@ -56,8 +56,8 @@ cria_base_intermediaria_aneel <- function(origem_processos
     # read.csv2(origem_processos,encoding = "latin1") %>%
     # janitor::clean_names()
 
-  anel_pd$vlr_custo_total_auditado <-sapply(anel_pd$vlr_custo_total_auditado, ajustar_separador_decimal)
-  anel_pd$vlr_custo_total_previsto <-sapply(anel_pd$vlr_custo_total_previsto, ajustar_separador_decimal)
+  anel_pd$vlr_custo_total_auditado <-as.numeric(sapply(anel_pd$vlr_custo_total_auditado, ajustar_separador_decimal))
+  anel_pd$vlr_custo_total_previsto <-as.numeric(sapply(anel_pd$vlr_custo_total_previsto, ajustar_separador_decimal))
 
   anel_pd <- anel_pd %>%
     mutate(data_de_carregamento = as.Date(paste0(ano_cadastro_proposta_projeto,"-01-01")),
