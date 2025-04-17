@@ -75,10 +75,10 @@ cria_base_intermediaria_aneel <- function(origem_processos
 
     dplyr::mutate(duracao_prevista              = case_when(!is.na(data_de_conclusao) ~ data_de_conclusao,
                                                      TRUE ~ lubridate::date(data_de_carregamento+lubridate::dmonths(duracao_prevista_meses))),
-           custo_total_previsto          = as.numeric(stringr::str_replace_all(
-                                           stringr::str_replace_all(custo_total_previsto, "[.$]", ""), "[,]", "." )),
-           custo_total_realizado         = as.numeric(stringr::str_replace_all(
-                                           stringr::str_replace_all(custo_total_realizado, "[.$]", ""), "[,]", "." )),
+           # custo_total_previsto          = as.numeric(stringr::str_replace_all(
+           #                                 stringr::str_replace_all(custo_total_previsto, "[.$]", ""), "[,]", "." )),
+           # custo_total_realizado         = as.numeric(stringr::str_replace_all(
+           #                                 stringr::str_replace_all(custo_total_realizado, "[.$]", ""), "[,]", "." )),
            custo_total_realizado         = dplyr::case_when(is.na(custo_total_realizado) ~ custo_total_previsto,
                                            TRUE~custo_total_realizado),
            duracao_dias                  = lubridate::time_length(data_de_conclusao - data_de_carregamento, "days"),
