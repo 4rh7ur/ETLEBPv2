@@ -46,12 +46,40 @@ cria_base_intermediaria_cnpq<- function(origem_processos
                 "Técnicas e Operações Florestais")
 
 #---------- Inicio do Tratamento ---------------------------------------------
+  ajustar_separador_decimal <- function(x) {
+    # Verifica se há ponto e/ou vírgula na string
+    has_point <- grepl("\\.", x)
+    has_comma <- grepl(",", x)
+
+    # Identifica qual separador está por último na string
+    last_separator <- ifelse(grepl("\\.[^,]*$", x), "point",
+                             ifelse(grepl(",[^\\.]*$", x), "comma", NA))
+
+    # Se não houver separador decimal, retorna o valor original
+    if (is.na(last_separator)) {
+      return(x)
+    }
+
+    # Realiza as transformações conforme a condição do último separador decimal
+    if (last_separator == "comma") {
+      if (has_point) {
+        # Caso a vírgula seja o separador decimal e exista ponto, remove ponto e substitui vírgula por ponto
+        x <- gsub("\\.", "", x)  # Remove ponto
+      }
+      x <- gsub(",", ".", x)      # Substitui vírgula por ponto
+    } else if (last_separator == "point" && has_comma) {
+      # Caso o ponto seja o separador decimal e exista vírgula, remove a vírgula
+      x <- gsub(",", "", x)
+    }
+
+    return(x)
+  }
 
 
   cnpq<-origem_processos
     # readxl::read_excel(path = origem_processos,sheet = 1, skip = 6) %>%
     # janitor::clean_names()
-
+  cnpq$valor_pago <- sapply(cnpq$valor_pago, ajustar_separador_decimal)
 
   cnpq <- cnpq %>%
   dplyr::filter(!area %in% termos_a,
